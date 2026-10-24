@@ -90,15 +90,20 @@ sealed class WmiDisplay : DisplayItem
 
     public override int ReadBrightness()
     {
-        using var searcher = new ManagementObjectSearcher(@"root\wmi", "SELECT InstanceName, CurrentBrightness FROM WmiMonitorBrightness");
-        foreach (ManagementObject mo in searcher.Get())
+        // WMI can fail transiently (e.g. right after resume from sleep); report "unknown" instead of crashing.
+        try
         {
-            using (mo)
+            using var searcher = new ManagementObjectSearcher(@"root\wmi", "SELECT InstanceName, CurrentBrightness FROM WmiMonitorBrightness");
+            foreach (ManagementObject mo in searcher.Get())
             {
-                if ((string)mo["InstanceName"] == instanceName)
-                    return (byte)mo["CurrentBrightness"];
+                using (mo)
+                {
+                    if ((string)mo["InstanceName"] == instanceName)
+                        return (byte)mo["CurrentBrightness"];
+                }
             }
         }
+        catch (Exception e) when (e is ManagementException or System.Runtime.InteropServices.COMException) { }
         return -1;
     }
 
