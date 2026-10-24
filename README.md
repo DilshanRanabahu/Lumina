@@ -19,13 +19,19 @@ Windows only gives you a brightness slider for the built-in laptop panel. Lumina
 - Optional "Start with Windows".
 - No background polling and no network access.
 
+## Download
+
+Grab `Lumina.exe` from the [latest release](https://github.com/DilshanRanabahu/Lumina/releases/latest) and run it. It's a single self-contained file, so .NET doesn't need to be installed.
+
+> **Windows SmartScreen warning:** the exe isn't code-signed yet, so the first time you run it Windows may show *"Windows protected your PC"*. Click **More info → Run anyway**. If you'd rather not, build it yourself from source (below).
+
 ## Requirements
 
 - Windows 10 or 11
-- [.NET 10 SDK](https://dotnet.microsoft.com/download) to build
+- [.NET 10 SDK](https://dotnet.microsoft.com/download), only if you build from source
 - **DDC/CI turned on** in your external monitor's on-screen menu. Most monitors have it on by default; on some it's under *Settings → General* or similar.
 
-## Build and run
+## Build from source
 
 ```powershell
 git clone https://github.com/DilshanRanabahu/Lumina.git
@@ -33,10 +39,10 @@ cd Lumina
 dotnet run
 ```
 
-To make a standalone `.exe`:
+To make the same single-file `.exe` as the release:
 
 ```powershell
-dotnet publish -c Release -r win-x64 --self-contained false -o publish
+dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish
 ```
 
 Then run `publish\Lumina.exe`.
@@ -80,3 +86,7 @@ If you want each screen's taskbar to show only the apps open on that screen, Win
 | `Displays.cs` | Screen discovery and brightness control (WMI + DDC/CI) |
 | `Native.cs` | Win32 / DXVA2 / DWM interop |
 | `Theme.cs` | Colors and dark context-menu renderer |
+
+## License
+
+[MIT](LICENSE)
